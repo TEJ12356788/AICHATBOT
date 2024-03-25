@@ -57,25 +57,30 @@ def main():
     def pdf_chat():
         st.header("PDF Chat")
 
-        # Allow user to ask a question
-        user_question = st.text_input("Ask a question about the PDF files")
+        # Option to upload PDF files or prompt a question
+        option = st.radio("Choose an option", ["Upload PDF files", "Prompt a question"])
 
-        if st.button("Submit & Process"):
-            with st.spinner("Processing..."):
-                pdf_docs = st.file_uploader("Upload PDF files", accept_multiple_files=True)
-                raw_text = get_pdf_text(pdf_docs)
-                text_chunks = get_text_chunks(raw_text)
-                get_vector_store(text_chunks)
-                st.success("PDF files processed successfully")
+        if option == "Upload PDF files":
+            # Allow user to upload PDF files
+            pdf_docs = st.file_uploader("Upload PDF files", accept_multiple_files=True)
+            if st.button("Submit & Process"):
+                with st.spinner("Processing..."):
+                    raw_text = get_pdf_text(pdf_docs)
+                    text_chunks = get_text_chunks(raw_text)
+                    get_vector_store(text_chunks)
+                    st.success("PDF files processed successfully")
 
-        # Allow user to input a question and receive a response
-        if user_question:
-            embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-            new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-            docs = new_db.similarity_search(user_question)
-            chain = get_conversational_chain()
-            response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
-            st.write("Response:", response["output_text"])
+        elif option == "Prompt a question":
+            # Allow user to input a question
+            user_question = st.text_input("Ask a question about the PDF files")
+            if user_question:
+                if st.button("Ask"):
+                    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+                    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+                    docs = new_db.similarity_search(user_question)
+                    chain = get_conversational_chain()
+                    response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
+                    st.write("Response:", response["output_text"])
 
     # Display the PDF chat functionality
     pdf_chat()
