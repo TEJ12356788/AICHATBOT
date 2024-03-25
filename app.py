@@ -40,18 +40,22 @@ def main():
 
     # Function to load and configure the conversational chain
     def get_conversational_chain():
-        prompt_template = """
-        Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-        provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
-        Context:\n {context}?\n
-        Question: \n{question}\n
+    # Define the prompt template for the conversational chain
+    prompt_template = """
+    Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    Context:\n{context}?\n
+    Question:\n{question}\n
 
-        Answer:
-        """
-        model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
-        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-        chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
-        return chain
+    Answer:
+    """
+    # Initialize the Google Generative AI model for chatting
+    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+    # Create a prompt using the defined template and input variables
+    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+    # Load the question-answering chain with the model and prompt
+    chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
+    return chain
 
     # Main function for PDF chat functionality
     def pdf_chat():
