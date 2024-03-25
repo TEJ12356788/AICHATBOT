@@ -21,8 +21,7 @@ load_dotenv()
 # Configure Google API key
 google_api_key = os.getenv("GOOGLE_API_KEY")
 
-# Configure Google's services with your API key
-GoogleGenerativeAIEmbeddings.configure(api_key=google_api_key)
+
 # read all pdf files and return text
 
 def get_pdf_text(pdf_docs):
