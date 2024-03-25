@@ -2,9 +2,10 @@ import streamlit as st
 from PyPDF2 import PdfReader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 def main():
     st.title("Text and PDF Chat")
@@ -18,7 +19,7 @@ def main():
                 for page in pdf_reader.pages:
                     text += page.extract_text()
             except Exception as e:
-                if type(e)._name_ == "PdfReadError":
+                if type(e).__name__ == "PdfReadError":
                     st.warning(f"Skipping non-PDF file: {pdf.name}. Error: {str(e)}")
                     continue
                 else:
@@ -39,32 +40,20 @@ def main():
 
     # Function to load and configure the conversational chain
     def get_conversational_chain():
-        try:
-            # Define the prompt template for the conversational chain
-            prompt_template = """
-            Answer the question as detailed as possible from the provided context, make sure to provide all the details,
-            provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
-            Context:\n{context}?\n
-            Question:\n{question}\n
+        prompt_template = """
+        Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+        provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+        Context:\n {context}?\n
+        Question: \n{question}\n
 
-            Answer:
-            """
-            
-            # Initialize the Google Generative AI model for chatting
-            model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
-            
-            # Create a prompt using the defined template and input variables
-            prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-            
-            # Load the question-answering chain with the model and prompt
-            chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
-            
-            return chain
-        except Exception as e:
-            print(f"Error occurred while initializing the conversational chain: {e}")
-            return None
+        Answer:
+        """
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+        chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
+        return chain
 
-    # Function for PDF chat functionality
+    # Main function for PDF chat functionality
     def pdf_chat():
         st.header("PDF Chat")
 
@@ -93,7 +82,23 @@ def main():
                     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
                     st.write("Response:", response["output_text"])
 
-    # Call the pdf_chat() function within main()
+    # Function for AI chat functionality
+    def ai_chat():
+        st.header("AI Chat")
+
+        user_input = st.text_input("You:", "")
+        if st.button("Send"):
+            if user_input.strip() != "":
+                model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+                response = model(user_input)
+                st.text_area("AI:", value=response, height=200)
+
+    # Display the PDF chat functionality
     pdf_chat()
-    if _name_ == "_main_":
-        main()
+
+    # Display the AI chat functionality
+    ai_chat()
+
+if __name__ == "__main__":
+    main()
+
