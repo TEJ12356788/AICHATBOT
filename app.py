@@ -20,8 +20,6 @@ load_dotenv()
 
 # Configure Google API key
 google_api_key = os.getenv("GOOGLE_API_KEY")
-if google_api_key is None:
-    raise ValueError("Google API key not found. Please set the GOOGLE_API_KEY environment variable.")
 
 # Configure Google's services with your API key
 GoogleGenerativeAIEmbeddings.configure(api_key=google_api_key)
