@@ -200,9 +200,10 @@ def main():
                         st.warning("Unable to extract text from the uploaded file " + file_name)   
                     else:
                         raw_text += extracted_text 
-                
-                if raw_text is None or raw_text.strip() == "":
-                    st.error("Text extraction failed for all uploaded files")
+                        if raw_text is None or raw_text.strip() == "":
+                            st.warning("Text extraction failed for the uploaded file " + file_name)
+                            continue  # Skip processing this file and move to the next one
+
                 else:
                     text_chunks = get_text_chunks(raw_text)
                     get_vector_store(text_chunks)
