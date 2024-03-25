@@ -151,12 +151,8 @@ def clear_chat_history():
         {"role": "assistant", "content": "Forget searching through endless folders! Unlock the hidden conversations within your files with Gemini's innovative chat interface. Ask questions, explore insights, and discover connections – all directly through natural language. Upload your files and interact with your data."}]
 
 def user_input(user_question):
-    try:
-        embeddings = GoogleGenerativeAIEmbeddings(
-            model="models/embedding-001", google_api_key=os.getenv("GOOGLE_API_KEY"))
-    except Exception as e:
-        print(f"Error initializing embeddings: {e}")
-        return None
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001")  # type: ignore
 
     new_db = FAISS.load_local("faiss_index", embeddings)
     docs = new_db.similarity_search(user_question)
@@ -168,7 +164,6 @@ def user_input(user_question):
 
     print(response)
     return response
-
 
 
 def main():
@@ -186,6 +181,8 @@ def main():
         
         if st.button("Submit & Process"):
             with st.spinner("Processing..."):
+                # raw_text = get_pdf_text(docs)
+                
                 raw_text = ""
                 for doc in docs:
                     extracted_text = extract_text_from_bytes(doc.getvalue(), get_file_extension(doc))
@@ -236,15 +233,16 @@ def main():
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = user_input(prompt)
-                if response is not None and 'output_text' in response:
-                    placeholder = st.empty()
-                    full_response = ''
-                    for item in response['output_text']:
-                        full_response += item
-                        placeholder.markdown(full_response)
+                placeholder = st.empty()
+                full_response = ''
+                for item in response['output_text']:
+                    full_response += item
                     placeholder.markdown(full_response)
-                else:
-                    st.error("Error processing response. Please try again.")
+                placeholder.markdown(full_response)
+        if response is not None:
+            message = {"role": "assistant", "content": full_response}
+            st.session_state.messages.append(message)
+
 
 if __name__ == "__main__":
     main()
