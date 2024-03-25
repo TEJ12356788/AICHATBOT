@@ -240,6 +240,8 @@ def main():
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = user_input(prompt)
+                if response is None:
+                    return  # Exit if response is None
                 placeholder = st.empty()
                 full_response = ''
                 for item in response['output_text']:
