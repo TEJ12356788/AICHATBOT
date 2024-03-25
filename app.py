@@ -154,7 +154,13 @@ def user_input(user_question):
     embeddings = GoogleGenerativeAIEmbeddings(
         model="models/embedding-001")  # type: ignore
 
-    new_db = FAISS.load_local("faiss_index", embeddings)
+    # Check if the FAISS index exists
+    index_path = "faiss_index"
+    if not os.path.exists(index_path):
+        st.error("FAISS index not found. Please upload files and process them first.")
+        return None
+
+    new_db = FAISS.load_local(index_path, embeddings)
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
@@ -164,6 +170,7 @@ def user_input(user_question):
 
     print(response)
     return response
+
 
 
 def main():
