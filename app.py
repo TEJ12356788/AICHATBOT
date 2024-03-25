@@ -39,23 +39,35 @@ def main():
         vector_store.save_local("faiss_index")
 
     # Function to load and configure the conversational chain
-    def get_conversational_chain():
-    # Define the prompt template for the conversational chain
-        prompt_template = """
-    Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
-    Context:\n{context}?\n
-    Question:\n{question}\n
+   from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.chains.question_answering import load_qa_chain
+from langchain.prompts import PromptTemplate
 
-    Answer:
-    """
-    # Initialize the Google Generative AI model for chatting
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
-    # Create a prompt using the defined template and input variables
-    prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-    # Load the question-answering chain with the model and prompt
-    chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
-    return chain
+def get_conversational_chain():
+    try:
+        # Define the prompt template for the conversational chain
+        prompt_template = """
+        Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+        provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+        Context:\n{context}?\n
+        Question:\n{question}\n
+
+        Answer:
+        """
+        
+        # Initialize the Google Generative AI model for chatting
+        model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+        
+        # Create a prompt using the defined template and input variables
+        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+        
+        # Load the question-answering chain with the model and prompt
+        chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
+        
+        return chain
+    except Exception as e:
+        print(f"Error occurred while initializing the conversational chain: {e}")
+        return None
 
     # Main function for PDF chat functionality
     def pdf_chat():
