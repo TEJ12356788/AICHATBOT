@@ -101,4 +101,4 @@ def get_conversational_chain():
     # Display the PDF chat functionality
     pdf_chat()
     if _name_ == "_main_":
-    main()
+        main()
