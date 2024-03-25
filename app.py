@@ -95,6 +95,5 @@ def main():
 
     # Call the pdf_chat() function within main()
     pdf_chat()
-
-if _name_ == "_main_":
-    main()
+    if _name_ == "_main_":
+        main()
