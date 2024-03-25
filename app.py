@@ -19,7 +19,7 @@ def main():
                 for page in pdf_reader.pages:
                     text += page.extract_text()
             except Exception as e:
-                if type(e).__name__ == "PdfReadError":
+                if type(e)._name_ == "PdfReadError":
                     st.warning(f"Skipping non-PDF file: {pdf.name}. Error: {str(e)}")
                     continue
                 else:
@@ -85,5 +85,5 @@ def main():
     # Display the PDF chat functionality
     pdf_chat()
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     main()
