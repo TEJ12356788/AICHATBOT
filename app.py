@@ -1,3 +1,4 @@
+# Import the necessary modules
 from pathlib import Path
 import textract
 import tempfile
@@ -14,10 +15,16 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
-os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
+# Configure Google API key
+google_api_key = os.getenv("GOOGLE_API_KEY")
+if google_api_key is None:
+    raise ValueError("Google API key not found. Please set the GOOGLE_API_KEY environment variable.")
+
+# Configure Google's services with your API key
+GoogleGenerativeAIEmbeddings.configure(api_key=google_api_key)
 # read all pdf files and return text
 
 def get_pdf_text(pdf_docs):
