@@ -205,6 +205,19 @@ def main():
                     text_chunks = get_text_chunks(raw_text)
                     get_vector_store(text_chunks)
                     st.success("Done")
+                    if st.session_state.messages[-1]["role"] != "assistant":
+                        with st.chat_message("assistant"):
+                            with st.spinner("Thinking..."):
+                                response = user_input(prompt)
+                                if response is not None and 'output_text' in response:
+                                    placeholder = st.empty()
+                                    full_response = ''
+                                    for item in response['output_text']:full_response += item
+                                        placeholder.markdown(full_response)
+                                    placeholder.markdown(full_response)
+                                else:
+                                    st.error("Error processing response. Please try again.")
+
 
     # Main content area for displaying chat messages
     st.title("Beyond Words: Chat with Your Files using Gemini 🪄")
