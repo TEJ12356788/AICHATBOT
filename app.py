@@ -72,10 +72,23 @@ def get_text_chunks(text):
 
 
 def get_vector_store(chunks):
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/embedding-001")  # type: ignore
-    vector_store = FAISS.from_texts(chunks, embedding=embeddings)
-    vector_store.save_local("faiss_index")
+    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+
+    if not chunks:
+        print("No text chunks found.")
+        return
+
+    if not embeddings:
+        print("No embeddings found.")
+        return
+
+    try:
+        vector_store = FAISS.from_texts(chunks, embedding=embeddings)
+        vector_store.save_local("faiss_index")
+        print("Vector store created successfully.")
+    except Exception as e:
+        print(f"Error creating vector store: {e}")
+
 
 
 def get_conversational_chain():
