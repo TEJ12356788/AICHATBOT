@@ -172,95 +172,19 @@ def user_input(user_question):
 
 
 def main():
-    st.set_page_config(
-        page_title="Gemini File Chatbot",
-        page_icon="🤖"
-    )
-
-    # Sidebar for uploading files
-    with st.sidebar:
-        st.title("Menu:")
-        st.write()
-        docs = st.file_uploader(
-            "Upload your Files and Click on the Submit & Process Button", accept_multiple_files=True)
-        
-        if st.button("Submit & Process"):
-            with st.spinner("Processing..."):
-                # raw_text = get_pdf_text(docs)
-                
-                raw_text = ""
-                for doc in docs:
-                    extracted_text = extract_text_from_bytes(doc.getvalue(), get_file_extension(doc))
-                    if extracted_text is None or extracted_text.strip() == "":
-                        file_name = ""
-                        if hasattr(doc, 'name'):
-                            file_name = Path(doc.name).name
-                        st.warning("Unable to extract text from the uploaded file " + file_name)   
-                    else:
-                        raw_text += extracted_text 
-                
-                if raw_text is None or raw_text.strip() == "":
-                    st.error("Text extraction failed for all uploaded files")
-                else:
-                    text_chunks = get_text_chunks(raw_text)
-                    get_vector_store(text_chunks)
-                    st.success("Done")
-                    if st.session_state.messages[-1]["role"] != "assistant":
-                        with st.chat_message("assistant"):
-                            with st.spinner("Thinking..."):
-                                response = user_input(prompt)
-                                if response is not None and 'output_text' in response:
-                                    placeholder = st.empty()
-                                    full_response = ''
-                                    for item in response['output_text']:full_response += item
-                                        placeholder.markdown(full_response)
-                                    placeholder.markdown(full_response)
-                                else:
-                                    st.error("Error processing response. Please try again.")
-
-
-    # Main content area for displaying chat messages
-    st.title("Beyond Words: Chat with Your Files using Gemini 🪄")
-    st.write("""
-        | Category                | File Types                                           |
-        |-------------------------|------------------------------------------------------|
-        | Text-Based Documents    | .csv, .json, .doc, .docx, .odt, .rtf, .eml, .msg, .epub, .txt |
-        | Media and Presentation  | .gif, .jpg, .jpeg, .png, .tiff, .tif, .mp3, .ogg, .wav, .pptx, .html, .htm |
-        | Structured Documents     | .pdf, .ps, .xlsx, .xls                                |
-        """)
-    st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
-
-    # Chat input
-    # Placeholder for chat messages
-
-    if "messages" not in st.session_state.keys():
-        st.session_state.messages = [
-            {"role": "assistant", "content": "Forget searching through endless folders! Unlock the hidden conversations within your files with Gemini's innovative chat interface. Ask questions, explore insights, and discover connections – all directly through natural language. Upload your files and interact with your data."}]
-
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-
-    if prompt := st.chat_input():
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.write(prompt)
+    # Previous code...
 
     # Display chat messages and bot response
     if st.session_state.messages[-1]["role"] != "assistant":
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 response = user_input(prompt)
-                placeholder = st.empty()
-                full_response = ''
-                for item in response['output_text']:
-                    full_response += item
+                if response is not None and 'output_text' in response:
+                    placeholder = st.empty()
+                    full_response = ''
+                    for item in response['output_text']:
+                        full_response += item
+                        placeholder.markdown(full_response)
                     placeholder.markdown(full_response)
-                placeholder.markdown(full_response)
-        if response is not None:
-            message = {"role": "assistant", "content": full_response}
-            st.session_state.messages.append(message)
-
-
-if __name__ == "__main__":
-    main()
+                else:
+                    st.error("Error processing response. Please try again.")
