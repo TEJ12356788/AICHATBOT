@@ -84,7 +84,7 @@ def main():
 
     # Function for AI chat functionality
     def ai_chat():
-    st.header("AI Chat")
+        st.header("AI Chat")
 
     user_input = st.text_input("You:", "")
     if st.button("Send"):
