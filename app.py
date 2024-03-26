@@ -89,13 +89,16 @@ def main():
         if st.button("Send"):
             if user_input.strip() != "":
                 try:
+                    st.info("Processing input...")
+                    st.info(f"Input: {user_input}")
+                    # Preprocess the input text if necessary
+                    # Pass the preprocessed input to the model
                     model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
                     response = model(user_input)
                     st.text_area("AI:", value=response, height=200)
                 except Exception as e:
-                    st.error(f"An error occurred: {e}")
-                    st.error(f"Input: {user_input}")
-                    st.error(f"Model Configuration: model='gemini-pro', temperature=0.3")
+                                      st.error(f"An error occurred: {e}")
+
 
 
     # Display the PDF chat functionality
