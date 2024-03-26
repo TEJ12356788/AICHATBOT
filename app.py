@@ -84,14 +84,17 @@ def main():
 
     # Function for AI chat functionality
     def ai_chat():
-        st.header("AI Chat")
+    st.header("AI Chat")
 
-        user_input = st.text_input("You:", "")
-        if st.button("Send"):
-            if user_input.strip() != "":
+    user_input = st.text_input("You:", "")
+    if st.button("Send"):
+        if user_input.strip() != "":
+            try:
                 model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
                 response = model(user_input)
                 st.text_area("AI:", value=response, height=200)
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
 
     # Display the PDF chat functionality
     pdf_chat()
