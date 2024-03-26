@@ -97,8 +97,10 @@ def main():
                     response = model(user_input)
                     st.text_area("AI:", value=response, height=200)
                 except Exception as e:
-                                      st.error(f"An error occurred: {e}")
-
+                    st.error(f"An error occurred: {e}")
+                    # Log additional information for debugging
+                    st.error(f"Input: {user_input}")
+                    st.error("Model Configuration: model='gemini-pro', temperature=0.3")
 
 
     # Display the PDF chat functionality
