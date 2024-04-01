@@ -17,11 +17,11 @@ def image_to_byte_array(image: Image) -> bytes:
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
-gemini_pro, gemini_vision = st.tabs(["Parvazbot Pro", "Parvazbot Pro Vision"])
+gemini_pro, gemini_vision = st.tabs(["AICHAT", "AICHAT Pro Vision"])
 
 def main():
     with gemini_pro:
-        st.header("Interact with Parvazbot Pro")
+        st.header("Interact with AICHAT Pro Vision")
         st.write("")
 
         prompt = st.text_input("Chat please...", placeholder="Prompt", label_visibility="visible")
@@ -90,6 +90,5 @@ def main():
             else:
                 st.write("")
                 st.header(":red[Please Provide an image]")
-
 if _name_ == "_main_":
     main()
