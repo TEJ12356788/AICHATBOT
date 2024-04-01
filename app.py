@@ -64,10 +64,10 @@ def main():
         elif input_type == "PDF":
             pdf_file = st.file_uploader("Upload a PDF file", type=["pdf"])
             if pdf_file is not None:
-                pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+                pdf_reader = PyPDF2.PdfReader(pdf_file)
                 text = ""
-                for page_num in range(pdf_reader.numPages):
-                    text += pdf_reader.getPage(page_num).extractText()
+                for page_num in range(len(pdf_reader.pages)):
+                    text += pdf_reader.pages[page_num].extract_text()
                 image_prompt = st.text_area("Extracted text from PDF", text)
 
         if st.button("GET RESPONSE", use_container_width=True):
