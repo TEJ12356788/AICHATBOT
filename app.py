@@ -17,11 +17,11 @@ def image_to_byte_array(image: Image) -> bytes:
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
-gemini_pro, gemini_vision, ai_chat_tab = st.columns([1, 1, 2])
+aichat_tab, aichat_vision_tab = st.columns([1, 1])
 
 def main():
-    with gemini_pro:
-        st.header("Interact with Parvazbot Pro")
+    with aichat_tab:
+        st.header("Interact with AICHAT Pro")
         st.write("")
 
         prompt = st.text_input("Chat please...", placeholder="Prompt", label_visibility="visible")
@@ -36,8 +36,8 @@ def main():
 
             st.markdown(response.text)
 
-    with gemini_vision:
-        st.header("Interact with Gemini Pro Vision")
+    with aichat_vision_tab:
+        st.header("Interact with AICHAT Pro Vision")
         st.write("")
 
         image_prompt = st.text_input("Interact with the Image", placeholder="Prompt", label_visibility="visible")
@@ -92,16 +92,5 @@ def main():
                 st.write("")
                 st.header(":red[Please Provide an image]")
 
-    with ai_chat_tab:
-        st.header("AI Chat")
-
-        user_input = st.text_input("You:", "")
-        if st.button("Send"):
-            if user_input.strip() != "":
-                model = genai.GenerativeModel("gemini-pro", temperature=0.3)
-                response = model.generate_content(user_input)
-                st.text_area("AI:", value=response.text, height=200)
-
 if __name__ == "__main__":
     main()
-
