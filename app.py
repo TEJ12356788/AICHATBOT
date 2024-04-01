@@ -1,23 +1,21 @@
 import streamlit as st
+from PyPDF2 import PdfReader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.chains.question_answering import load_qa_chain
+from langchain.prompts import PromptTemplate
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 import google.generativeai as genai
 import google.ai.generativelanguage as glm
-from dotenv import load_dotenv
-from PIL import Image
 import os
-import io
 
 load_dotenv()
-
-def image_to_byte_array(image: Image) -> bytes:
-    imgByteArr = io.BytesIO()
-    image.save(imgByteArr, format=image.format)
-    imgByteArr = imgByteArr.getvalue()
-    return imgByteArr
 
 API_KEY = os.environ.get("GOOGLE_API_KEY")
 genai.configure(api_key=API_KEY)
 
-aichat_tab, aichat_vision_tab = st.columns([1, 1])
+aichat_tab, aichat_vision_tab, pdf_chat_tab = st.columns([1, 1, 1])
 
 def main():
     with aichat_tab:
@@ -41,56 +39,46 @@ def main():
         st.write("")
 
         image_prompt = st.text_input("Interact with the Image", placeholder="Prompt", label_visibility="visible")
-        uploaded_file = st.file_uploader("Choose an Image", accept_multiple_files=False,
-                                         type=["png", "jpg", "jpeg", "img", "webp"])
-
-        if uploaded_file is not None:
-            st.image(Image.open(uploaded_file), use_column_width=True)
-
-            st.markdown("""
-                <style>
-                        img {
-                            border-radius: 10px;
-                        }
-                </style>
-                """, unsafe_allow_html=True)
-
         if st.button("GET RESPONSE", use_container_width=True):
             model = genai.GenerativeModel("gemini-pro-vision")
 
-            if uploaded_file is not None:
-                if image_prompt != "":
-                    image = Image.open(uploaded_file)
+            if image_prompt != "":
+                response = model.generate_content(image_prompt)
 
-                    response = model.generate_content(
-                        glm.Content(
-                            parts=[
-                                glm.Part(text=image_prompt),
-                                glm.Part(
-                                    inline_data=glm.Blob(
-                                        mime_type="image/jpeg",
-                                        data=image_to_byte_array(image)
-                                    )
-                                )
-                            ]
-                        )
-                    )
+                st.write("")
+                st.write(":blue[Response]")
+                st.write("")
 
-                    response.resolve()
-
-                    st.write("")
-                    st.write(":blue[Response]")
-                    st.write("")
-
-                    st.markdown(response.text)
-
-                else:
-                    st.write("")
-                    st.header(":red[Please Provide a message]")
-
+                st.markdown(response.text)
             else:
                 st.write("")
-                st.header(":red[Please Provide an image]")
+                st.header(":red[Please provide a message]")
+
+    with pdf_chat_tab:
+        st.header("PDF Chat")
+
+        option = st.radio("Choose an option", ["Upload PDF files", "Prompt a question"])
+
+        if option == "Upload PDF files":
+            pdf_docs = st.file_uploader("Upload PDF files", accept_multiple_files=True)
+            if st.button("Submit & Process"):
+                with st.spinner("Processing..."):
+                    raw_text = get_pdf_text(pdf_docs)
+                    text_chunks = get_text_chunks(raw_text)
+                    get_vector_store(text_chunks)
+                    st.success("PDF files processed successfully")
+
+        elif option == "Prompt a question":
+            user_question = st.text_input("Ask a question about the PDF files")
+            if user_question:
+                if st.button("Ask"):
+                    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+                    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
+                    docs = new_db.similarity_search(user_question)
+                    chain = get_conversational_chain()
+                    response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
+                    st.write("Response:", response["output_text"])
 
 if __name__ == "__main__":
     main()
+
