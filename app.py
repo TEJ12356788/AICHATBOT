@@ -87,7 +87,7 @@ def pdf_chat():
                 st.write("Response:", response["output_text"])
 
 def ai_chat():
-    st.header("AI Chat")
+    st.header("Financial Analysis")
 
     prompt = st.text_input("Chat please...", placeholder="Prompt", label_visibility="visible")
     if st.button("ENTER", use_container_width=True):
@@ -152,7 +152,7 @@ def ai_chat():
             st
 
 def main():
-    st.title("AI and PDF Chat")
+    st.title("AI reporting")
 
     pdf_chat_tab = st.container()
     ai_chat_tab = st.container()
